@@ -12,9 +12,12 @@ import java.util.ArrayList;
  *
  * @author Vasiliy
  */
+
 public interface I_MESI_Model {
     public
-    void Initialize(int Cache_Num, int Memory_Size, int Cache_Size);
+    void Initialize(int Cache_Num, int Memory_Size, int Cache_Size, int String_Size);
     ArrayList<String> GetMemory();
-    ArrayList<ArrayList<String>> GetCaches();
+    ArrayList<I_MESI_Cache> GetCaches();
 }
+
+

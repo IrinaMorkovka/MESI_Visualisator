@@ -14,10 +14,10 @@ import java.util.ArrayList;
  */
 
 public interface I_MESI_Model {
-    public
-    void Initialize(int Cache_Num, int Memory_Size, int Cache_Size, int String_Size);
-    ArrayList<String> GetMemory();
-    ArrayList<I_MESI_Cache> GetCaches();
+    
+    public void Initialize(int Cache_Num, int Memory_Size, int Cache_Size, int String_Size);
+    public ArrayList<String> GetMemory();
+    public ArrayList<I_MESI_Cache> GetCaches();
 }
 
 

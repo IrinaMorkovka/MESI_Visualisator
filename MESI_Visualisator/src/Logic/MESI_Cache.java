@@ -28,6 +28,7 @@ public class MESI_Cache implements I_MESI_Cache {
         this.Cache_Size = Cache_Size; 
         Strings = new ArrayList<>(Cache_Size);
         States  = new ArrayList<>(Cache_Size);
+        MemoryStringNumbers  = new ArrayList<>(Cache_Size);
         for (int i=0; i < Cache_Size;i++)
          {
              Strings.add("");

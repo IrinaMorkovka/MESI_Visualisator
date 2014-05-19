@@ -72,5 +72,6 @@ public class CacheTableModel extends AbstractTableModel  {
         this.States = Cache.GetStringStates();
         this.Strings = Cache.GetStrings();
         this.MemoryStringNumbers = Cache.GetMemStringsNums();
+        this.RowCount = Cache.GetSize();
     }
 }

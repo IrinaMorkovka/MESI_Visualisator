@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * @author Vasiliy
  */
 public interface I_MESI_Cache {
-   
+    public int GetSize();
      public ArrayList<MESI_States> GetStringStates();      
      public ArrayList<String> GetStrings();
      public ArrayList<Integer> GetMemStringsNums();

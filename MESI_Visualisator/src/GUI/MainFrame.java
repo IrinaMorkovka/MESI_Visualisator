@@ -7,8 +7,14 @@
 package GUI;
 
 import Logic.MESI_Model_Test;
+import java.awt.Component;
 import java.text.NumberFormat;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.text.NumberFormatter;
 
 /**
@@ -38,8 +44,9 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        MemoryTable = new javax.swing.JTable();
         NumberFormat format = NumberFormat.getInstance();
+        format.setGroupingUsed(false);
         NumberFormatter formatter = new NumberFormatter(format);
         formatter.setValueClass(Integer.class);
         formatter.setMinimum(1);
@@ -73,10 +80,10 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        MemoryTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
             {
-                {null, null}
+
             },
             new String []
             {
@@ -103,8 +110,10 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(jTable1);
+        MemoryTable.getColumnModel().getColumn(0).setMaxWidth(50);
+        MemoryTable.getTableHeader().setReorderingAllowed(false);
+        MemoryTable.setShowVerticalLines(true);
+        jScrollPane1.setViewportView(MemoryTable);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -251,8 +260,36 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
         MESI_Model.Initialize(Cache_Num, Mem_Size, Cache_Size, String_Size);
+        ((DefaultTableModel)this.MemoryTable.getModel()).setRowCount(Mem_Size);
+        for (int i=0;i<Mem_Size;i++)
+            ((DefaultTableModel)this.MemoryTable.getModel()).setValueAt(i+1, i, 0);
+        adjustColumnSizes(MemoryTable, 0, 2);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+   public void adjustColumnSizes(JTable table, int column, int margin) {
+        DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
+        TableColumn col = colModel.getColumn(column);
+        int width;
+
+        TableCellRenderer renderer = col.getHeaderRenderer();
+        if (renderer == null) {
+            renderer = table.getTableHeader().getDefaultRenderer();
+        }
+        Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
+        width = comp.getPreferredSize().width;
+
+        for (int r = 0; r < table.getRowCount(); r++) {
+            renderer = table.getCellRenderer(r, column);
+            comp = renderer.getTableCellRendererComponent(table, table.getValueAt(r, column), false, false, r, column);
+            int currentWidth = comp.getPreferredSize().width;
+            width = Math.max(width, currentWidth);
+        }
+
+        width += 2 * margin;
+
+        col.setPreferredWidth(width);
+        col.setMaxWidth(width);
+    }
     /**
      * @param args the command line arguments
      */
@@ -273,16 +310,7 @@ public class MainFrame extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex)
-        {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex)
-        {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex)
-        {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex)
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
         {
             java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
@@ -290,6 +318,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
                 new MainFrame().setVisible(true);
@@ -301,6 +330,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField Cache_Num_Field;
     private javax.swing.JFormattedTextField Cache_Size_Field;
     private javax.swing.JFormattedTextField Mem_Size_Field;
+    private javax.swing.JTable MemoryTable;
     private javax.swing.JFormattedTextField String_Size_Field;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -312,6 +342,5 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

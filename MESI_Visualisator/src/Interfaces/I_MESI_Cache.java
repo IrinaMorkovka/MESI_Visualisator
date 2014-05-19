@@ -16,4 +16,5 @@ public interface I_MESI_Cache {
    
      public ArrayList<MESI_States> GetStringStates();      
      public ArrayList<String> GetStrings();
+     public ArrayList<Integer> GetMemStringsNums();
 }

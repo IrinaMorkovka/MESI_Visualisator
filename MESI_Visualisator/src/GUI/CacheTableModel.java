@@ -21,6 +21,7 @@ public class CacheTableModel extends AbstractTableModel  {
     private ArrayList<Integer> MemoryStringNumbers; 
     private ArrayList<String> Strings; 
     private ArrayList<MESI_States> States;
+    private final String[] tableHeaders = {"Номер","Состояние","Тэг","Содержимое"};
 
     public CacheTableModel()
     {
@@ -39,6 +40,11 @@ public class CacheTableModel extends AbstractTableModel  {
     {
         return 4;
     }
+    
+    @Override
+    public String getColumnName(int columnIndex) {
+        return tableHeaders[columnIndex];
+    }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex)
@@ -51,13 +57,13 @@ public class CacheTableModel extends AbstractTableModel  {
                 switch (States.get(rowIndex))
                 {
                     case INVALID:
-                        return "I";
+                        return "Invalid";
                     case EXCLUSIVE:
-                        return "E";
+                        return "Exclusive";
                     case SHARED:
-                        return "S";
+                        return "Shared";
                     case MODIFIED:
-                        return "M";
+                        return "Modified";
                 }
             case 2:
                 return MemoryStringNumbers.get(rowIndex);

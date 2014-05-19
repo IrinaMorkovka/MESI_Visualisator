@@ -6,10 +6,14 @@
 
 package GUI;
 
+import Interfaces.I_MESI_Cache;
+import Logic.MESI_Model;
 import Logic.MESI_Model_Test;
 import java.awt.Component;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
@@ -42,6 +46,7 @@ public class MainFrame extends javax.swing.JFrame {
     {
 
         jPanel1 = new javax.swing.JPanel();
+        CachePane = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         MemoryTable = new javax.swing.JTable();
@@ -71,11 +76,11 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addComponent(CachePane)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 231, Short.MAX_VALUE)
+            .addComponent(CachePane, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -249,7 +254,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
     {//GEN-HEADEREND:event_jButton1ActionPerformed
-        MESI_Model_Test MESI_Model = new MESI_Model_Test();
+        MESI_Model MESI_Model = new MESI_Model();
         int Cache_Num = Integer.parseInt(this.Cache_Num_Field.getText());
         int Mem_Size = Integer.parseInt(this.Mem_Size_Field.getText());
         int Cache_Size = Integer.parseInt(this.Cache_Size_Field.getText());
@@ -264,6 +269,24 @@ public class MainFrame extends javax.swing.JFrame {
         for (int i=0;i<Mem_Size;i++)
             ((DefaultTableModel)this.MemoryTable.getModel()).setValueAt(i+1, i, 0);
         adjustColumnSizes(MemoryTable, 0, 2);
+        ArrayList<I_MESI_Cache> Caches = MESI_Model.GetCaches();
+        this.CachePane.removeAll();
+        for (int i=0; i<Cache_Num; i++)
+        {
+            JTable CacheTable = new javax.swing.JTable();
+            CacheTableModel Model = new CacheTableModel();
+            Model.ExtractCacheData(Caches.get(i));
+            CacheTable.setModel(Model);
+            adjustColumnSizes(CacheTable, 0, 2);
+            adjustColumnSizes(CacheTable, 1, 2);
+            adjustColumnSizes(CacheTable, 2, 2);
+            JScrollPane ScrollPane = new JScrollPane();
+            ScrollPane.add(CacheTable);
+            ScrollPane.setViewportView(CacheTable);
+            CachePane.add(ScrollPane);
+        }
+        this.CachePane.validate();
+        this.CachePane.repaint();
     }//GEN-LAST:event_jButton1ActionPerformed
 
    public void adjustColumnSizes(JTable table, int column, int margin) {
@@ -327,6 +350,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane CachePane;
     private javax.swing.JFormattedTextField Cache_Num_Field;
     private javax.swing.JFormattedTextField Cache_Size_Field;
     private javax.swing.JFormattedTextField Mem_Size_Field;

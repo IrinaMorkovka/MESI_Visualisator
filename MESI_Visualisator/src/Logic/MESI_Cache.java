@@ -152,4 +152,10 @@ public class MESI_Cache implements I_MESI_Cache {
     {
         return new ArrayList<>(this.MemoryStringNumbers);
     }
+
+    @Override
+    public int GetSize()
+    {
+       return this.Cache_Size;
+    }
 }

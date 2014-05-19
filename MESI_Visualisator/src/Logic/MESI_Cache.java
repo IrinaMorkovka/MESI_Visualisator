@@ -146,4 +146,10 @@ public class MESI_Cache implements I_MESI_Cache {
         }
         return false;
     }
+
+    @Override
+    public ArrayList<Integer> GetMemStringsNums()
+    {
+        return new ArrayList<>(this.MemoryStringNumbers);
+    }
 }

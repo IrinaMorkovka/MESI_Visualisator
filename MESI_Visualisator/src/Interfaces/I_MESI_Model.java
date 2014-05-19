@@ -18,6 +18,9 @@ public interface I_MESI_Model {
     public void Initialize(int Cache_Num, int Memory_Size, int Cache_Size, int String_Size);
     public ArrayList<String> GetMemory();
     public ArrayList<I_MESI_Cache> GetCaches();
+    public void ReadToCache(int Cache_Num, int Mem_String_Num);
+    public void WriteToCache(int Cache_Num, int Mem_String_Num, String New);
+    public void DropFromCache(int Cache_Num, int Cache_String_Num);
 }
 
 

@@ -36,5 +36,23 @@ public class MESI_Model_Test implements I_MESI_Model  {
     {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public void ReadToCache(int Cache_Num, int Mem_String_Num)
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void WriteToCache(int Cache_Num, int Mem_String_Num, String New)
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void DropFromCache(int Cache_Num, int Cache_String_Num)
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

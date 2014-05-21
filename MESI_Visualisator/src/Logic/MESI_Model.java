@@ -103,4 +103,16 @@ public class MESI_Model implements I_MESI_Model  {
          for(int i=0; i<this.Caches.size(); i++)
             Caches.get(i).Invalidate(Mem_String_Num);
     }
+
+    @Override
+    public int GetCacheNum()
+    {
+        return this.Caches.size();
+    }
+
+    @Override
+    public int GetMemSize()
+    {
+        return this.Memory_Size;
+    }
 }

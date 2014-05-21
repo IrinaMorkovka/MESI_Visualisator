@@ -17,17 +17,23 @@ import javax.swing.table.AbstractTableModel;
  */
 public class CacheTableModel extends AbstractTableModel  {
 
-    int RowCount;
+    private int RowCount;
+    private int CacheNumber;
     private ArrayList<Integer> MemoryStringNumbers; 
     private ArrayList<String> Strings; 
     private ArrayList<MESI_States> States;
     private final String[] tableHeaders = {"Номер","Состояние","Тэг","Содержимое"};
 
-    public CacheTableModel()
+    public CacheTableModel(int CacheNumber)
     {
         this.RowCount = 0;
+        this.CacheNumber = CacheNumber;
     }
     
+    public int GetCacheNumber()
+    {
+        return this.CacheNumber;
+    }
     @Override
     public int getRowCount()
     {
@@ -66,7 +72,9 @@ public class CacheTableModel extends AbstractTableModel  {
                         return "Modified";
                 }
             case 2:
-                return MemoryStringNumbers.get(rowIndex);
+                if (MemoryStringNumbers.get(rowIndex)==-1)
+                    return "";
+                else return MemoryStringNumbers.get(rowIndex);
             case 3:
                 return Strings.get(rowIndex);
             default:
@@ -80,4 +88,5 @@ public class CacheTableModel extends AbstractTableModel  {
         this.MemoryStringNumbers = Cache.GetMemStringsNums();
         this.RowCount = Cache.GetSize();
     }
+    
 }

@@ -8,16 +8,25 @@ package GUI;
 
 import Interfaces.I_MESI_Cache;
 import Logic.MESI_Model;
-import Logic.MESI_Model_Test;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import static javax.swing.BorderFactory.createLineBorder;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -30,6 +39,11 @@ import javax.swing.text.NumberFormatter;
  */
 public class MainFrame extends javax.swing.JFrame {
 
+    private ArrayList<JTable> CacheTables;
+    private ArrayList<JScrollPane> CacheScrollPanes;
+    int SelectedCacheNum;
+    int SelectedMemoryString;
+    MESI_Model Model;
     /**
      * Creates new form MainFrame
      */
@@ -37,8 +51,56 @@ public class MainFrame extends javax.swing.JFrame {
     {
         initComponents();
         adjustColumnSizes(MemoryTable, 0, 2);
-    }
+        CacheTables = new ArrayList<>(6);
+        CacheScrollPanes = new ArrayList<>(6);
+        SelectedCacheNum = -1;
+        CacheComboBox.addActionListener (new ActionListener () {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                SelectCache(((JComboBox)e.getSource()).getSelectedIndex());
+            }
+        });
+        StringComboBox.addActionListener (new ActionListener () {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                SelectMemoryString(((JComboBox)e.getSource()).getSelectedIndex());
+            }
+        });
+        MemoryTable.getSelectionModel().addListSelectionListener(new ListSelectionListener () {
 
+            @Override
+            public void valueChanged(ListSelectionEvent e)
+            {
+               SelectMemoryString(((ListSelectionModel)e.getSource()).getMaxSelectionIndex());
+            }
+          
+        });
+         Model = new MESI_Model();
+    }
+    
+    
+
+    private class CacheTableMouseListener extends MouseAdapter{
+
+        @Override
+        public void mouseClicked(MouseEvent e)
+        {
+            SelectCache(CacheTables.indexOf((JTable)e.getSource()));
+        }      
+        
+    }
+    
+    private class CacheScrollPaneMouseListener extends MouseAdapter{
+
+        @Override
+        public void mouseClicked(MouseEvent e)
+        {
+            SelectCache(CacheScrollPanes.indexOf((JScrollPane)e.getSource()));
+        }      
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -69,6 +131,15 @@ public class MainFrame extends javax.swing.JFrame {
         Cache_Size_Field = new javax.swing.JFormattedTextField(formatter);
         String_Size_Field = new javax.swing.JFormattedTextField(formatter);
         jPanel4 = new javax.swing.JPanel();
+        CacheComboBox = new javax.swing.JComboBox();
+        jLabel5 = new javax.swing.JLabel();
+        StringComboBox = new javax.swing.JComboBox();
+        jLabel6 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         CachePane = new javax.swing.JPanel();
@@ -108,6 +179,7 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        MemoryTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         MemoryTable.getTableHeader().setReorderingAllowed(false);
         MemoryTable.setShowVerticalLines(true);
         jScrollPane1.setViewportView(MemoryTable);
@@ -116,7 +188,7 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -172,7 +244,7 @@ public class MainFrame extends javax.swing.JFrame {
                                 .addComponent(Mem_Size_Field, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(Cache_Size_Field, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(String_Size_Field, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -201,15 +273,64 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel4.setPreferredSize(new java.awt.Dimension(217, 178));
 
+        jLabel5.setText("Выбор кэша");
+
+        jLabel6.setText("<html>\nВыбор строки в памяти\n</html>");
+
+        jButton2.setText("Считать");
+
+        jButton3.setText("Инвалидировать");
+
+        jLabel7.setText("Новое значение строки:");
+
+        jButton4.setText("Записать");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 213, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(CacheComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(StringComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addGap(0, 81, Short.MAX_VALUE))
+                    .addComponent(jTextField1)
+                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CacheComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(StringComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton4)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         java.awt.GridBagLayout CachePaneLayout = new java.awt.GridBagLayout();
@@ -236,12 +357,12 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -265,7 +386,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
     {//GEN-HEADEREND:event_jButton1ActionPerformed
-        MESI_Model MESI_Model = new MESI_Model();
+       
         int Cache_Num = Integer.parseInt(this.Cache_Num_Field.getText());
         int Mem_Size = Integer.parseInt(this.Mem_Size_Field.getText());
         int Cache_Size = Integer.parseInt(this.Cache_Size_Field.getText());
@@ -275,14 +396,35 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(rootPane, "Размер кэша не может превышать размер памяти", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        MESI_Model.Initialize(Cache_Num, Mem_Size, Cache_Size, String_Size);
-        ((DefaultTableModel)this.MemoryTable.getModel()).setRowCount(Mem_Size);
-        for (int i=0;i<Mem_Size;i++)
+        Model.Initialize(Cache_Num, Mem_Size, Cache_Size, String_Size);
+        
+        this.SetUpMemory();
+        this.SetUpCaches();
+        
+        this.validate();
+        this.repaint();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void SetUpMemory()
+    {
+        ((DefaultTableModel)this.MemoryTable.getModel()).setRowCount(Model.GetMemSize());
+        StringComboBox.removeAllItems();
+        for (int i=0;i<Model.GetMemSize();i++)
+        {
             ((DefaultTableModel)this.MemoryTable.getModel()).setValueAt(i+1, i, 0);
+            StringComboBox.addItem("Строка № " + String.valueOf(i+1));
+        }
         adjustColumnSizes(MemoryTable, 0, 2);
-        ArrayList<I_MESI_Cache> Caches = MESI_Model.GetCaches();
+        SelectMemoryString(0);
+    }
+    private void SetUpCaches()
+    {
+        ArrayList<I_MESI_Cache> Caches = Model.GetCaches();
         this.CachePane.removeAll();
-        for (int i=0; i<Cache_Num; i++)
+        this.CacheTables.clear();
+        this.CacheComboBox.removeAllItems();
+        this.CacheScrollPanes.clear();
+        for (int i=0; i<Model.GetCacheNum(); i++)
         {
             GridBagConstraints constraints = new GridBagConstraints();
             constraints.gridx = i%2;
@@ -297,18 +439,10 @@ public class MainFrame extends javax.swing.JFrame {
             Label.setMaximumSize(Label.getPreferredSize());
             CachePane.add(Label,constraints);
             
-            constraints = new GridBagConstraints();
-            constraints.gridx = i%2;
-            constraints.gridy = 2*(i/2)+1;
-            constraints.gridwidth = 1;
-            constraints.gridheight = 1;
-            constraints.weightx = 1;
-            constraints.weighty = 1;
-            constraints.fill = GridBagConstraints.HORIZONTAL;
-            constraints.anchor = GridBagConstraints.NORTHWEST;
+          
             
             JTable CacheTable = new javax.swing.JTable();
-            CacheTableModel Model = new CacheTableModel();
+            CacheTableModel Model = new CacheTableModel(0);
             Model.ExtractCacheData(Caches.get(0));
             CacheTable.setModel(Model);
             adjustColumnSizes(CacheTable, 0, 2);
@@ -316,22 +450,32 @@ public class MainFrame extends javax.swing.JFrame {
             adjustColumnSizes(CacheTable, 2, 2);
             adjustColumnSizes(CacheTable, 3, 2);
             adjustTableSize(CacheTable);
+            CacheTable.getTableHeader().setReorderingAllowed(false);
+            CacheTable.setShowVerticalLines(true);
+            CacheTable.addMouseListener(new CacheTableMouseListener());
+            CacheTables.add(CacheTable);
             JScrollPane ScrollPane = new JScrollPane();
-            
+            //ScrollPane.setBorder(createLineBorder(Color.BLACK,1));
+            ScrollPane.addMouseListener(new CacheScrollPaneMouseListener());
+            CacheScrollPanes.add(ScrollPane);
             ScrollPane.add(CacheTable);
             ScrollPane.setViewportView(CacheTable);
             ScrollPane.setPreferredSize(new Dimension(CacheTable.getMaximumSize().width+20,
                     130));
             
+            constraints.gridy = 2*(i/2)+1;
+            constraints.weightx = 1;
+            constraints.weighty = 1;
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.anchor = GridBagConstraints.NORTHWEST;
             
             CachePane.add(ScrollPane,constraints);
+            
+            CacheComboBox.addItem("Кэш № " + String.valueOf(i+1));
         }
-       
-        this.validate();
-        this.repaint();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-   public void adjustColumnSizes(JTable table, int column, int margin) {
+        this.SelectCache(0);
+    }
+   private void adjustColumnSizes(JTable table, int column, int margin) {
         DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
         TableColumn col = colModel.getColumn(column);
         int width;
@@ -355,7 +499,7 @@ public class MainFrame extends javax.swing.JFrame {
         col.setPreferredWidth(width);
         col.setMaxWidth(width);
     }
-   public void adjustTableSize(JTable table) {
+   private void adjustTableSize(JTable table) {
         DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
         int MaxWidth  = 0;
         int PreferredWidth  = 0;
@@ -366,6 +510,32 @@ public class MainFrame extends javax.swing.JFrame {
         }
         table.setPreferredSize(new Dimension(PreferredWidth,table.getPreferredSize().height));
     }
+   
+   private void SelectCache(int Num)
+   {
+       if ((SelectedCacheNum != Num) && (Num != -1))
+       {
+           if (SelectedCacheNum != -1)
+           {
+               CacheScrollPanes.get(SelectedCacheNum).setBorder(createLineBorder(Color.BLACK,1));
+           }
+           SelectedCacheNum = Num;
+           CacheScrollPanes.get(SelectedCacheNum).setBorder(createLineBorder(Color.BLACK,3));
+           CacheComboBox.setSelectedIndex(Num);
+       }
+       
+   }
+   
+    private void SelectMemoryString(int Num)
+   {
+       if ((SelectedMemoryString != Num) && (Num != -1))
+       {
+           SelectedMemoryString = Num;
+           MemoryTable.setRowSelectionInterval(Num, Num);
+           StringComboBox.setSelectedIndex(Num);
+       }
+       
+   }
     /**
      * @param args the command line arguments
      */
@@ -403,22 +573,31 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox CacheComboBox;
     private javax.swing.JPanel CachePane;
     private javax.swing.JFormattedTextField Cache_Num_Field;
     private javax.swing.JFormattedTextField Cache_Size_Field;
     private javax.swing.JFormattedTextField Mem_Size_Field;
     private javax.swing.JTable MemoryTable;
+    private javax.swing.JComboBox StringComboBox;
     private javax.swing.JFormattedTextField String_Size_Field;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

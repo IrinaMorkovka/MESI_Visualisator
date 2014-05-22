@@ -74,7 +74,7 @@ public class CacheTableModel extends AbstractTableModel  {
             case 2:
                 if (MemoryStringNumbers.get(rowIndex)==-1)
                     return "";
-                else return MemoryStringNumbers.get(rowIndex);
+                else return MemoryStringNumbers.get(rowIndex)+1;
             case 3:
                 return Strings.get(rowIndex);
             default:

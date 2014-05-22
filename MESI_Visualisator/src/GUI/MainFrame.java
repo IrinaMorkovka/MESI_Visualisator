@@ -44,6 +44,7 @@ public class MainFrame extends javax.swing.JFrame {
     private ArrayList<JScrollPane> CacheScrollPanes;
     int SelectedCacheNum;
     int SelectedMemoryString;
+    int SelectedCacheString;
     I_MESI_Model Model;
     /**
      * Creates new form MainFrame
@@ -67,6 +68,13 @@ public class MainFrame extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e)
             {
                 SelectMemoryString(((JComboBox)e.getSource()).getSelectedIndex());
+            }
+        });
+        CacheStringComboBox.addActionListener (new ActionListener () {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                SelectCacheString(((JComboBox)e.getSource()).getSelectedIndex());
             }
         });
         MemoryTable.getSelectionModel().addListSelectionListener(new ListSelectionListener () {
@@ -102,6 +110,16 @@ public class MainFrame extends javax.swing.JFrame {
         }      
         
     }
+    
+    private class CacheTableSelectionListener implements ListSelectionListener{
+
+        @Override
+            public void valueChanged(ListSelectionEvent e)
+            {
+               SelectCacheString(((ListSelectionModel)e.getSource()).getMaxSelectionIndex());
+            }  
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -126,7 +144,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        InitButton = new javax.swing.JButton();
         Cache_Num_Field = new javax.swing.JFormattedTextField(formatter);
         Mem_Size_Field = new javax.swing.JFormattedTextField(formatter);
         Cache_Size_Field = new javax.swing.JFormattedTextField(formatter);
@@ -136,11 +154,13 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         StringComboBox = new javax.swing.JComboBox();
         jLabel6 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
+        ReadButton = new javax.swing.JButton();
+        InvalidateButton = new javax.swing.JButton();
+        NewStringField = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        jButton4 = new javax.swing.JButton();
+        WriteButton = new javax.swing.JButton();
+        CacheStringComboBox = new javax.swing.JComboBox();
+        jLabel8 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         CachePane = new javax.swing.JPanel();
@@ -207,12 +227,12 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel4.setText("Размер строки");
 
-        jButton1.setText("Иницализировать модель");
-        jButton1.addActionListener(new java.awt.event.ActionListener()
+        InitButton.setText("Иницализировать модель");
+        InitButton.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
-                jButton1ActionPerformed(evt);
+                InitButtonActionPerformed(evt);
             }
         });
 
@@ -231,7 +251,7 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(InitButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
@@ -267,24 +287,59 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(String_Size_Field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
+                .addComponent(InitButton)
                 .addContainerGap(80, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel4.setEnabled(false);
         jPanel4.setPreferredSize(new java.awt.Dimension(217, 178));
+
+        CacheComboBox.setEnabled(false);
 
         jLabel5.setText("Выбор кэша");
 
+        StringComboBox.setEnabled(false);
+
         jLabel6.setText("<html>\nВыбор строки в памяти\n</html>");
 
-        jButton2.setText("Считать");
+        ReadButton.setText("Считать");
+        ReadButton.setEnabled(false);
+        ReadButton.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                ReadButtonActionPerformed(evt);
+            }
+        });
 
-        jButton3.setText("Инвалидировать");
+        InvalidateButton.setText("Инвалидировать");
+        InvalidateButton.setEnabled(false);
+        InvalidateButton.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                InvalidateButtonActionPerformed(evt);
+            }
+        });
+
+        NewStringField.setEnabled(false);
 
         jLabel7.setText("Новое значение строки:");
 
-        jButton4.setText("Записать");
+        WriteButton.setText("Записать");
+        WriteButton.setEnabled(false);
+        WriteButton.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                WriteButtonActionPerformed(evt);
+            }
+        });
+
+        CacheStringComboBox.setEnabled(false);
+
+        jLabel8.setText("<html>\nВыбор строки в кэше\n</html>");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -293,21 +348,24 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(CacheComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(StringComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ReadButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(InvalidateButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addGap(0, 81, Short.MAX_VALUE))
-                    .addComponent(jTextField1)
-                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(NewStringField)
+                    .addComponent(WriteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel5)
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(CacheComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(StringComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(CacheStringComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -321,17 +379,21 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(StringComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(CacheStringComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addComponent(ReadButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(InvalidateButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(NewStringField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton4)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(WriteButton)
+                .addGap(23, 23, 23))
         );
 
         java.awt.GridBagLayout CachePaneLayout = new java.awt.GridBagLayout();
@@ -348,7 +410,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+            .addComponent(jScrollPane2)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -374,7 +436,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE))
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -385,9 +447,16 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
-    {//GEN-HEADEREND:event_jButton1ActionPerformed
+    private void InitButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_InitButtonActionPerformed
+    {//GEN-HEADEREND:event_InitButtonActionPerformed
        
+        this.CacheComboBox.setEnabled(true);
+        this.StringComboBox.setEnabled(true);
+        this.CacheStringComboBox.setEnabled(true);
+        this.ReadButton.setEnabled(true);
+        this.WriteButton.setEnabled(true);
+        this.NewStringField.setEnabled(true);
+        
         int Cache_Num = Integer.parseInt(this.Cache_Num_Field.getText());
         int Mem_Size = Integer.parseInt(this.Mem_Size_Field.getText());
         int Cache_Size = Integer.parseInt(this.Cache_Size_Field.getText());
@@ -404,8 +473,45 @@ public class MainFrame extends javax.swing.JFrame {
         
         this.validate();
         this.repaint();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_InitButtonActionPerformed
 
+    private void ReadButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ReadButtonActionPerformed
+    {//GEN-HEADEREND:event_ReadButtonActionPerformed
+        Model.ReadToCache(this.SelectedCacheNum, this.SelectedMemoryString);
+        Update();
+    }//GEN-LAST:event_ReadButtonActionPerformed
+
+    private void InvalidateButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_InvalidateButtonActionPerformed
+    {//GEN-HEADEREND:event_InvalidateButtonActionPerformed
+        Model.DropFromCache(this.SelectedCacheNum, this.SelectedCacheString);
+        Update();
+    }//GEN-LAST:event_InvalidateButtonActionPerformed
+
+    private void WriteButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_WriteButtonActionPerformed
+    {//GEN-HEADEREND:event_WriteButtonActionPerformed
+      Model.WriteToCache(SelectedCacheNum, SelectedMemoryString, this.NewStringField.getText());
+      Update();
+    }//GEN-LAST:event_WriteButtonActionPerformed
+
+    private void Update() {
+        ArrayList<I_MESI_Cache> Caches = Model.GetCaches();
+        for (int i = 0; i < this.CacheTables.size(); i++)
+        {
+            ((CacheTableModel)CacheTables.get(i).getModel()).ExtractCacheData(Caches.get(i));
+            adjustColumnSizes(CacheTables.get(i), 0, 2);
+            adjustColumnSizes(CacheTables.get(i), 1, 2);
+            adjustColumnSizes(CacheTables.get(i), 2, 2);
+            adjustColumnSizes(CacheTables.get(i), 3, 2);
+            adjustTableSize(CacheTables.get(i));
+        }
+        ArrayList<String> Memory = Model.GetMemory();
+        for (int i = 0; i < this.MemoryTable.getRowCount(); i++)
+        {
+            this.MemoryTable.setValueAt(Memory.get(i), i, 1);
+        }
+        CheckInvalidateButton();
+        this.repaint();
+    }
     private void SetUpMemory()
     {
         ((DefaultTableModel)this.MemoryTable.getModel()).setRowCount(Model.GetMemSize());
@@ -454,6 +560,8 @@ public class MainFrame extends javax.swing.JFrame {
             CacheTable.getTableHeader().setReorderingAllowed(false);
             CacheTable.setShowVerticalLines(true);
             CacheTable.addMouseListener(new CacheTableMouseListener());
+            CacheTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+            CacheTable.getSelectionModel().addListSelectionListener(new CacheTableSelectionListener());
             CacheTables.add(CacheTable);
             JScrollPane ScrollPane = new JScrollPane();
             //ScrollPane.setBorder(createLineBorder(Color.BLACK,1));
@@ -474,7 +582,11 @@ public class MainFrame extends javax.swing.JFrame {
             
             CacheComboBox.addItem("Кэш № " + String.valueOf(i+1));
         }
+        for (int i=0; i<Model.GetCahceSize();i++)
+            this.CacheStringComboBox.addItem("Строка № "+ String.valueOf(i+1));
+        
         this.SelectCache(0);
+        this.SelectCacheString(0);        
     }
    private void adjustColumnSizes(JTable table, int column, int margin) {
         DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
@@ -523,6 +635,7 @@ public class MainFrame extends javax.swing.JFrame {
            SelectedCacheNum = Num;
            CacheScrollPanes.get(SelectedCacheNum).setBorder(createLineBorder(Color.BLACK,3));
            CacheComboBox.setSelectedIndex(Num);
+           SelectCacheString(CacheTables.get(SelectedCacheNum).getSelectedRow());
        }
        
    }
@@ -539,6 +652,23 @@ public class MainFrame extends javax.swing.JFrame {
        }
        
    }
+    
+    private void SelectCacheString(int Num)
+    {
+        if ((SelectedCacheString != Num) && (Num != -1))
+       {
+           SelectedCacheString = Num;
+           CacheTables.get(SelectedCacheNum).setRowSelectionInterval(Num, Num);
+           CacheStringComboBox.setSelectedIndex(Num);
+           CheckInvalidateButton();
+       }
+    }
+    private void CheckInvalidateButton()
+    {
+        if (CacheTables.get(SelectedCacheNum).getValueAt(SelectedCacheString, 2) != "")
+               this.InvalidateButton.setEnabled(true);
+           else this.InvalidateButton.setEnabled(false);
+    }
     /**
      * @param args the command line arguments
      */
@@ -578,16 +708,18 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox CacheComboBox;
     private javax.swing.JPanel CachePane;
+    private javax.swing.JComboBox CacheStringComboBox;
     private javax.swing.JFormattedTextField Cache_Num_Field;
     private javax.swing.JFormattedTextField Cache_Size_Field;
+    private javax.swing.JButton InitButton;
+    private javax.swing.JButton InvalidateButton;
     private javax.swing.JFormattedTextField Mem_Size_Field;
     private javax.swing.JTable MemoryTable;
+    private javax.swing.JTextField NewStringField;
+    private javax.swing.JButton ReadButton;
     private javax.swing.JComboBox StringComboBox;
     private javax.swing.JFormattedTextField String_Size_Field;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton WriteButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -595,12 +727,12 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

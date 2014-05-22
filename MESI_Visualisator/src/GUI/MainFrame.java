@@ -7,6 +7,7 @@
 package GUI;
 
 import Interfaces.I_MESI_Cache;
+import Interfaces.I_MESI_Model;
 import Logic.MESI_Model;
 import java.awt.Color;
 import java.awt.Component;
@@ -43,7 +44,7 @@ public class MainFrame extends javax.swing.JFrame {
     private ArrayList<JScrollPane> CacheScrollPanes;
     int SelectedCacheNum;
     int SelectedMemoryString;
-    MESI_Model Model;
+    I_MESI_Model Model;
     /**
      * Creates new form MainFrame
      */
@@ -533,6 +534,8 @@ public class MainFrame extends javax.swing.JFrame {
            SelectedMemoryString = Num;
            MemoryTable.setRowSelectionInterval(Num, Num);
            StringComboBox.setSelectedIndex(Num);
+           int CacheStringNum = Num % Model.GetCahceSize();
+           CacheTables.get(SelectedCacheNum).setRowSelectionInterval(CacheStringNum, CacheStringNum);
        }
        
    }

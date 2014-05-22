@@ -23,6 +23,8 @@ public interface I_MESI_Model {
     public void DropFromCache(int Cache_Num, int Cache_String_Num);
     public int  GetCacheNum();
     public int  GetMemSize();
+    public int  GetCahceSize();
+    public int  GetStringSize();
 }
 
 

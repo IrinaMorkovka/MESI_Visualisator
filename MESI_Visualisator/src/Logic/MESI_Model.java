@@ -115,4 +115,16 @@ public class MESI_Model implements I_MESI_Model  {
     {
         return this.Memory_Size;
     }
+
+    @Override
+    public int GetCahceSize()
+    {
+        return this.Cache_Size;
+    }
+
+    @Override
+    public int GetStringSize()
+    {
+        return this.String_Size;
+    }
 }

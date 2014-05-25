@@ -45,6 +45,10 @@ public class MainFrame extends javax.swing.JFrame {
     int SelectedCacheNum;
     int SelectedMemoryString;
     int SelectedCacheString;
+    boolean ProgramSelection;
+    boolean SelectingCache;
+    boolean SelectingCacheString;
+    boolean SelectingMemoryString;
     I_MESI_Model Model;
     /**
      * Creates new form MainFrame
@@ -60,21 +64,24 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                SelectCache(((JComboBox)e.getSource()).getSelectedIndex());
+                if (!ProgramSelection)
+                    SelectCache(((JComboBox)e.getSource()).getSelectedIndex());
             }
         });
         StringComboBox.addActionListener (new ActionListener () {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                SelectMemoryString(((JComboBox)e.getSource()).getSelectedIndex());
+                if (!ProgramSelection)
+                    SelectMemoryString(((JComboBox)e.getSource()).getSelectedIndex());
             }
         });
         CacheStringComboBox.addActionListener (new ActionListener () {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                SelectCacheString(((JComboBox)e.getSource()).getSelectedIndex());
+                if (!ProgramSelection)
+                    SelectCacheString(SelectedCacheNum,((JComboBox)e.getSource()).getSelectedIndex());
             }
         });
         MemoryTable.getSelectionModel().addListSelectionListener(new ListSelectionListener () {
@@ -82,11 +89,14 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void valueChanged(ListSelectionEvent e)
             {
-               SelectMemoryString(((ListSelectionModel)e.getSource()).getMaxSelectionIndex());
+                if (!ProgramSelection)
+                    SelectMemoryString(((ListSelectionModel)e.getSource()).getMaxSelectionIndex());
             }
           
         });
          Model = new MESI_Model();
+         SelectingCacheString = false;
+         SelectingMemoryString = false;
     }
     
     
@@ -113,10 +123,15 @@ public class MainFrame extends javax.swing.JFrame {
     
     private class CacheTableSelectionListener implements ListSelectionListener{
 
+        private int TableNum;
+        public CacheTableSelectionListener(int TableNum) {
+            this.TableNum = TableNum;
+        }
         @Override
             public void valueChanged(ListSelectionEvent e)
             {
-               SelectCacheString(((ListSelectionModel)e.getSource()).getMaxSelectionIndex());
+                if (!ProgramSelection)                   
+                    SelectCacheString(TableNum,((ListSelectionModel)e.getSource()).getMaxSelectionIndex());
             }  
         
     }
@@ -467,9 +482,12 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
         Model.Initialize(Cache_Num, Mem_Size, Cache_Size, String_Size);
-        
-        this.SetUpMemory();
+        SelectedCacheNum = -1;
+        SelectedMemoryString = -1;
+        SelectedCacheString = -1;
         this.SetUpCaches();
+        this.SetUpMemory();
+        
         
         this.validate();
         this.repaint();
@@ -531,6 +549,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.CacheTables.clear();
         this.CacheComboBox.removeAllItems();
         this.CacheScrollPanes.clear();
+        ProgramSelection = true;
         for (int i=0; i<Model.GetCacheNum(); i++)
         {
             GridBagConstraints constraints = new GridBagConstraints();
@@ -561,8 +580,8 @@ public class MainFrame extends javax.swing.JFrame {
             CacheTable.setShowVerticalLines(true);
             CacheTable.addMouseListener(new CacheTableMouseListener());
             CacheTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-            CacheTable.getSelectionModel().addListSelectionListener(new CacheTableSelectionListener());
-            CacheTables.add(CacheTable);
+            CacheTables.add(CacheTable);            
+            CacheTable.getSelectionModel().addListSelectionListener(new CacheTableSelectionListener(CacheTables.size()-1));
             JScrollPane ScrollPane = new JScrollPane();
             //ScrollPane.setBorder(createLineBorder(Color.BLACK,1));
             ScrollPane.addMouseListener(new CacheScrollPaneMouseListener());
@@ -584,9 +603,8 @@ public class MainFrame extends javax.swing.JFrame {
         }
         for (int i=0; i<Model.GetCahceSize();i++)
             this.CacheStringComboBox.addItem("Строка № "+ String.valueOf(i+1));
-        
-        this.SelectCache(0);
-        this.SelectCacheString(0);        
+        ProgramSelection = false;
+        this.SelectCache(0);           
     }
    private void adjustColumnSizes(JTable table, int column, int margin) {
         DefaultTableColumnModel colModel = (DefaultTableColumnModel) table.getColumnModel();
@@ -626,45 +644,89 @@ public class MainFrame extends javax.swing.JFrame {
    
    private void SelectCache(int Num)
    {
-       if ((SelectedCacheNum != Num) && (Num != -1))
+       boolean PrevPrgSel = ProgramSelection;
+       ProgramSelection = true;
+       SelectingCache = true;
+       if ((SelectedCacheNum != Num))
        {
            if (SelectedCacheNum != -1)
            {
                CacheScrollPanes.get(SelectedCacheNum).setBorder(createLineBorder(Color.BLACK,1));
            }
            SelectedCacheNum = Num;
-           CacheScrollPanes.get(SelectedCacheNum).setBorder(createLineBorder(Color.BLACK,3));
            CacheComboBox.setSelectedIndex(Num);
-           SelectCacheString(CacheTables.get(SelectedCacheNum).getSelectedRow());
+           if (Num != -1)
+           {
+               CacheScrollPanes.get(SelectedCacheNum).setBorder(createLineBorder(Color.BLACK,3));
+               SelectMemoryString(SelectedMemoryString);
+           }
        }
+       SelectingCache = false;
+       ProgramSelection = PrevPrgSel;
        
    }
    
     private void SelectMemoryString(int Num)
    {
-       if ((SelectedMemoryString != Num) && (Num != -1))
+       boolean PrevPrgSel = ProgramSelection;
+       ProgramSelection = true;
+       SelectingMemoryString = true;
+       if (((SelectedMemoryString != Num) ||  SelectingCache) && (Num != -1))
        {
            SelectedMemoryString = Num;
-           MemoryTable.setRowSelectionInterval(Num, Num);
            StringComboBox.setSelectedIndex(Num);
-           int CacheStringNum = Num % Model.GetCahceSize();
-           CacheTables.get(SelectedCacheNum).setRowSelectionInterval(CacheStringNum, CacheStringNum);
+           MemoryTable.setRowSelectionInterval(Num, Num);
+           if (!SelectingCacheString)
+           {
+               int CacheStringNum = Num % Model.GetCahceSize();
+               SelectCacheString(SelectedCacheNum,CacheStringNum);
+           }
+
        }
+       SelectingMemoryString = false;
+       ProgramSelection = PrevPrgSel;
        
    }
     
-    private void SelectCacheString(int Num)
+    private void SelectCacheString(int CacheNum, int Num)
     {
-        if ((SelectedCacheString != Num) && (Num != -1))
-       {
-           SelectedCacheString = Num;
-           CacheTables.get(SelectedCacheNum).setRowSelectionInterval(Num, Num);
-           CacheStringComboBox.setSelectedIndex(Num);
-           CheckInvalidateButton();
+       boolean PrevPrgSel = ProgramSelection;
+       ProgramSelection = true;
+       SelectingCacheString = true;
+       if ((SelectedCacheString != Num || SelectingCache) && (Num != -1) )
+       {          
+           if (CacheTables.get(CacheNum).getValueAt(Num, 2) != "" || SelectingMemoryString)
+           {
+               SelectedCacheString = Num;
+               CacheTables.get(CacheNum).setRowSelectionInterval(Num, Num);
+               CacheStringComboBox.setSelectedIndex(Num);
+               if (!SelectingMemoryString)
+               {
+                   SelectMemoryString(Integer.parseInt(CacheTables.get(CacheNum).getValueAt(Num, 2).toString()));
+               }
+           } else
+           {
+               this.CacheStringComboBox.setSelectedIndex(SelectedCacheString);
+               if (SelectedCacheString != -1)
+               {
+                   CacheTables.get(CacheNum).setRowSelectionInterval(SelectedCacheString, SelectedCacheString);
+               } else
+               {
+                   CacheTables.get(CacheNum).clearSelection();
+               }
+           }          
        }
+       CheckInvalidateButton();
+       SelectingCacheString = false;
+       ProgramSelection = PrevPrgSel;
     }
     private void CheckInvalidateButton()
     {
+        if (SelectedCacheNum == -1 || SelectedCacheString == -1)
+        {
+           this.InvalidateButton.setEnabled(false);
+           return;
+        }
         if (CacheTables.get(SelectedCacheNum).getValueAt(SelectedCacheString, 2) != "")
                this.InvalidateButton.setEnabled(true);
            else this.InvalidateButton.setEnabled(false);

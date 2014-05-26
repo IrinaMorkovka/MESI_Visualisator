@@ -20,11 +20,12 @@ public interface I_MESI_Model {
     public ArrayList<I_MESI_Cache> GetCaches();
     public void ReadToCache(int Cache_Num, int Mem_String_Num);
     public void WriteToCache(int Cache_Num, int Mem_String_Num, String New);
-    public void DropFromCache(int Cache_Num, int Cache_String_Num);
+    public void DropFromCache(int Cache_Num, int Mem_String_Num);
     public int  GetCacheNum();
     public int  GetMemSize();
     public int  GetCahceSize();
     public int  GetStringSize();
+    public ArrayList<MESI_Operation_Descriptor> GetOperations();
 }
 
 

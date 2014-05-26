@@ -7,7 +7,9 @@
 package Logic;
 
 import Interfaces.I_MESI_Cache;
+import Interfaces.MESI_Operation_Descriptor;
 import Interfaces.MESI_States;
+import Interfaces.MESI_Transitions;
 import java.util.ArrayList;
 
 /**
@@ -17,15 +19,17 @@ import java.util.ArrayList;
 public class MESI_Cache implements I_MESI_Cache {
 
     private int Cache_Size;
+    private int Cache_Num;
     private ArrayList<Integer> MemoryStringNumbers; 
     private ArrayList<String> Strings; 
     private ArrayList<MESI_States> States;
     private MESI_Model Parent;
     
-    public MESI_Cache(int Cache_Size, MESI_Model Parent)
+    public MESI_Cache(int Cache_Size, MESI_Model Parent, int Cache_Num)
     {
         this.Parent = Parent;
         this.Cache_Size = Cache_Size; 
+        this.Cache_Num = Cache_Num;
         Strings = new ArrayList<>(Cache_Size);
         States  = new ArrayList<>(Cache_Size);
         MemoryStringNumbers  = new ArrayList<>(Cache_Size);
@@ -49,84 +53,139 @@ public class MESI_Cache implements I_MESI_Cache {
         return new ArrayList<>(Strings);
     }
     
-    void Read(int Mem_String_Num)
+    public void Read(int Mem_String_Num, ArrayList<MESI_Operation_Descriptor> Operations)
     {
         int CacheStringNum = Mem_String_Num % Cache_Size;
-        if ((States.get(CacheStringNum) != MESI_States.INVALID)
-                && (MemoryStringNumbers.get(CacheStringNum) == Mem_String_Num))
+        if (MemoryStringNumbers.get(CacheStringNum) == Mem_String_Num)
         {
+            switch (States.get(CacheStringNum))
+            {
+                 case EXCLUSIVE:
+                     Operations.add(new MESI_Operation_Descriptor(
+                     MESI_Transitions.EXCLUSIVE_TO_EXCLUSIVE_READ, Cache_Num,
+                             Cache_Num,Mem_String_Num));
+                     return;
+                 case SHARED:
+                     Operations.add(new MESI_Operation_Descriptor(
+                     MESI_Transitions.SHARED_TO_SHARED_READ, Cache_Num,
+                             Cache_Num,Mem_String_Num));
+                     return;
+                 case MODIFIED:
+                     Operations.add(new MESI_Operation_Descriptor(
+                     MESI_Transitions.MODIFIED_TO_MODIFIED_READ, Cache_Num,
+                             Cache_Num,Mem_String_Num));
+                     return;
+            }
             return;
         }
-        switch (States.get(CacheStringNum))
+        this.Drop(CacheStringNum, Operations,Cache_Num);
+        Operations.add(new MESI_Operation_Descriptor(
+                MESI_Transitions.READ_REQUEST, Cache_Num,
+                Cache_Num, Mem_String_Num));
+        boolean Shared = Parent.IsAlreadyCached(Mem_String_Num,Cache_Num);
+        Operations.add(new MESI_Operation_Descriptor(
+                MESI_Transitions.READING_FROM_MEMORY, Cache_Num,
+                Cache_Num, Mem_String_Num));
+        Strings.set(CacheStringNum, Parent.GetFromMemory(Mem_String_Num));
+        MemoryStringNumbers.set(CacheStringNum, Mem_String_Num);
+        if (Shared)
         {
-            case MODIFIED:
-            {
-                this.Drop(CacheStringNum);
-            }
-            case INVALID:
-            case EXCLUSIVE:
-            case SHARED:
-            {
-
-                boolean Shared = Parent.IsAlreadyCached(Mem_String_Num);
-                Strings.set(CacheStringNum, Parent.GetFromMemory(Mem_String_Num));
-                MemoryStringNumbers.set(CacheStringNum, Mem_String_Num);
-                if (Shared)
-                {
-                    States.set(CacheStringNum, MESI_States.SHARED);
-                } else
-                {
-                    States.set(CacheStringNum, MESI_States.EXCLUSIVE);
-                }
-            }
+            Operations.add(new MESI_Operation_Descriptor(
+                    MESI_Transitions.INVALID_TO_SHARED, Cache_Num,
+                    Cache_Num, Mem_String_Num));
+            States.set(CacheStringNum, MESI_States.SHARED);
+        } else
+        {
+            Operations.add(new MESI_Operation_Descriptor(
+                    MESI_Transitions.INVALID_TO_EXCLUSIVE, Cache_Num,
+                    Cache_Num, Mem_String_Num));
+            States.set(CacheStringNum, MESI_States.EXCLUSIVE);
         }
     }
+
     
-    void Drop(int CacheStringNum)
+    
+    public void Drop(int CacheStringNum, ArrayList<MESI_Operation_Descriptor> Operations, int Primary_Cache_Num)
     {
-        if (States.get(CacheStringNum) == MESI_States.MODIFIED)
-            Parent.SetToMemory(MemoryStringNumbers.get(CacheStringNum), Strings.get(CacheStringNum));
+        switch (States.get(CacheStringNum))
+        {
+            case EXCLUSIVE:
+                Operations.add(new MESI_Operation_Descriptor(
+                            MESI_Transitions.EXCLUSIVE_TO_INVALID, Primary_Cache_Num,
+                            Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+                break;
+            case SHARED:
+                 Operations.add(new MESI_Operation_Descriptor(
+                            MESI_Transitions.SHARED_TO_INVALID, Primary_Cache_Num,
+                            Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+                break;
+            case MODIFIED:
+                Operations.add(new MESI_Operation_Descriptor(
+                            MESI_Transitions.WRITE_TO_MEMORY, Primary_Cache_Num,
+                            Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+                Parent.SetToMemory(MemoryStringNumbers.get(CacheStringNum), Strings.get(CacheStringNum));
+                Operations.add(new MESI_Operation_Descriptor(
+                            MESI_Transitions.MODIFIED_TO_INVALID, Primary_Cache_Num,
+                            Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+        }
         Strings.set(CacheStringNum, "");
         States.set(CacheStringNum, MESI_States.INVALID);
         MemoryStringNumbers.set(CacheStringNum, -1);
     }
     
-    void Write(int Mem_String_Num, String New)
+    public  void Write(int Mem_String_Num, String New, ArrayList<MESI_Operation_Descriptor> Operations)
     {
         int CacheStringNum = Mem_String_Num % Cache_Size;
-        switch (States.get(CacheStringNum))
+        if (MemoryStringNumbers.get(CacheStringNum) == Mem_String_Num)
         {
-            case MODIFIED:
+            switch (States.get(CacheStringNum))
             {
-                 if ( (MemoryStringNumbers.get(CacheStringNum) == Mem_String_Num))
-                 {
-                     Strings.set(CacheStringNum, New);
-                     return;
-                 }
-                 this.Drop(CacheStringNum);                 
+                case MODIFIED:
+                    Operations.add(new MESI_Operation_Descriptor(
+                            MESI_Transitions.MODIFIED_TO_MODIFIED_WRITE, Cache_Num,
+                            Cache_Num, Mem_String_Num));
+                    Strings.set(CacheStringNum, New);
+                    return;
+                case EXCLUSIVE:
+                    Operations.add(new MESI_Operation_Descriptor(
+                            MESI_Transitions.EXCLUSIVE_TO_MODIFIED, Cache_Num,
+                            Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+                    break;
+                case SHARED:
+                    Operations.add(new MESI_Operation_Descriptor(
+                            MESI_Transitions.INVALIDATE_REQUSET, Cache_Num,
+                            Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+                    Parent.Invalidate(Mem_String_Num,Cache_Num);
+                    Operations.add(new MESI_Operation_Descriptor(
+                            MESI_Transitions.SHARED_TO_MODIFIED, Cache_Num,
+                            Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+                    break;
             }
-            case INVALID:
-            case SHARED: 
-            case EXCLUSIVE:            
-            {
-                if ((States.get(CacheStringNum) != MESI_States.EXCLUSIVE) 
-                        ||(MemoryStringNumbers.get(CacheStringNum) != Mem_String_Num ))
-                    Parent.Invalidate(Mem_String_Num);
-                States.set(CacheStringNum, MESI_States.MODIFIED);
-                Strings.set(CacheStringNum, Parent.GetFromMemory(Mem_String_Num));
-                MemoryStringNumbers.set(CacheStringNum, Mem_String_Num);
-            }
+        } else
+        {
+            this.Drop(CacheStringNum, Operations, Cache_Num);
+            Operations.add(new MESI_Operation_Descriptor(
+                    MESI_Transitions.INVALIDATE_REQUSET, Cache_Num,
+                    Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+            Parent.Invalidate(Mem_String_Num,Cache_Num);
+            Operations.add(new MESI_Operation_Descriptor(
+                    MESI_Transitions.INVALID_TO_MODIFIED, Cache_Num,
+                    Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
         }
+        States.set(CacheStringNum, MESI_States.MODIFIED);
+        Strings.set(CacheStringNum, New);
+        MemoryStringNumbers.set(CacheStringNum, Mem_String_Num);
     }
     
-    void Invalidate(int Mem_String_Num)
+    public void Invalidate(int Mem_String_Num, ArrayList<MESI_Operation_Descriptor> Operations, int Primary_Cache_Num)
     {
          int CacheStringNum = Mem_String_Num % Cache_Size;
          if (MemoryStringNumbers.get(CacheStringNum) == Mem_String_Num )
-             Drop(CacheStringNum);
+             this.Drop(CacheStringNum,Operations,Primary_Cache_Num);
     }
     
-    boolean RequestToShare(int Mem_String_Num)
+    public boolean RequestToShare(int Mem_String_Num,
+            ArrayList<MESI_Operation_Descriptor> Operations, int Primary_Cache_Num)
     {
         int CacheStringNum = Mem_String_Num % Cache_Size;
         if (MemoryStringNumbers.get(CacheStringNum) == Mem_String_Num)
@@ -137,11 +196,26 @@ public class MESI_Cache implements I_MESI_Cache {
                 case INVALID:
                     return false;
                 case MODIFIED: {
+                    Operations.add(new MESI_Operation_Descriptor(
+                    MESI_Transitions.WRITE_TO_MEMORY, Primary_Cache_Num,
+                    Cache_Num, Mem_String_Num));
                     Parent.SetToMemory(MemoryStringNumbers.get(CacheStringNum), Strings.get(CacheStringNum));
+                    Operations.add(new MESI_Operation_Descriptor(
+                    MESI_Transitions.MODIFIED_TO_SHARED, Primary_Cache_Num,
+                    Cache_Num, Mem_String_Num));
+                    States.set(CacheStringNum, MESI_States.SHARED);
+                    return true;
                 }
                 case EXCLUSIVE:
+                    Operations.add(new MESI_Operation_Descriptor(
+                    MESI_Transitions.EXCLUSIVE_TO_SHARED, Primary_Cache_Num,
+                    Cache_Num, Mem_String_Num));
                     States.set(CacheStringNum, MESI_States.SHARED);
+                    return true;
                 case SHARED:
+                    Operations.add(new MESI_Operation_Descriptor(
+                    MESI_Transitions.SHARED_TO_SHARED, Primary_Cache_Num,
+                    Cache_Num, Mem_String_Num));
                     return true;
             }
         }

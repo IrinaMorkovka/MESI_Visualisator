@@ -8,6 +8,7 @@ package GUI;
 
 import Interfaces.I_MESI_Cache;
 import Interfaces.I_MESI_Model;
+import Interfaces.MESI_Operation_Descriptor;
 import Logic.MESI_Model;
 import java.awt.Color;
 import java.awt.Component;
@@ -26,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableColumnModel;
@@ -42,14 +44,23 @@ public class MainFrame extends javax.swing.JFrame {
 
     private ArrayList<JTable> CacheTables;
     private ArrayList<JScrollPane> CacheScrollPanes;
-    int SelectedCacheNum;
-    int SelectedMemoryString;
-    int SelectedCacheString;
-    boolean ProgramSelection;
-    boolean SelectingCache;
-    boolean SelectingCacheString;
-    boolean SelectingMemoryString;
-    I_MESI_Model Model;
+    private int SelectedCacheNum;
+    private int SelectedMemoryString;
+    private int SelectedCacheString;
+    private boolean ProgramSelection;
+    private boolean SelectingCache;
+    private boolean SelectingCacheString;
+    private boolean SelectingMemoryString;
+    private I_MESI_Model Model;
+    
+    private ArrayList<MESI_Operation_Descriptor> Operations;
+    private int VisualisatorStepNum;
+    
+    enum Commands  {WRITE, READ, INVALIDATE};
+    
+    private Commands Command;
+    
+    Timer Timer;
     /**
      * Creates new form MainFrame
      */
@@ -97,6 +108,22 @@ public class MainFrame extends javax.swing.JFrame {
          Model = new MESI_Model();
          SelectingCacheString = false;
          SelectingMemoryString = false;
+         
+         Operations = new ArrayList<>(0);
+         VisualisatorStepNum = 0;
+         this.ReportArea.setEditable(false);
+         this.ReportArea.setLineWrap(true);
+         this.ReportArea.setWrapStyleWord(true);
+         
+         Timer = new Timer(1000, new ActionListener () {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if (VisualisatorStepNum < Operations.size()-1)
+                    NextStep();
+                else btPauseActionPerformed(null);
+            }}
+         );
     }
     
     
@@ -145,9 +172,6 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents()
     {
 
-        jPanel2 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        MemoryTable = new javax.swing.JTable();
         NumberFormat format = NumberFormat.getInstance();
         format.setGroupingUsed(false);
         NumberFormatter formatter = new NumberFormatter(format);
@@ -176,60 +200,29 @@ public class MainFrame extends javax.swing.JFrame {
         WriteButton = new javax.swing.JButton();
         CacheStringComboBox = new javax.swing.JComboBox();
         jLabel8 = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        ReportArea = new javax.swing.JTextArea();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        MemoryTable = new javax.swing.JTable();
+        jPanel8 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        btStart = new javax.swing.JButton();
+        btPlay = new javax.swing.JButton();
+        btPrev = new javax.swing.JButton();
+        btPause = new javax.swing.JButton();
+        btNext = new javax.swing.JButton();
+        btEnd = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         CachePane = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel2.setPreferredSize(new java.awt.Dimension(492, 214));
-
-        MemoryTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][]
-            {
-
-            },
-            new String []
-            {
-                "Номер", "Содержание"
-            }
-        )
-        {
-            Class[] types = new Class []
-            {
-                java.lang.Integer.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean []
-            {
-                false, false
-            };
-
-            public Class getColumnClass(int columnIndex)
-            {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex)
-            {
-                return canEdit [columnIndex];
-            }
-        });
-        MemoryTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        MemoryTable.getTableHeader().setReorderingAllowed(false);
-        MemoryTable.setShowVerticalLines(true);
-        jScrollPane1.setViewportView(MemoryTable);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
-        );
+        setMinimumSize(new java.awt.Dimension(850, 600));
+        setPreferredSize(new java.awt.Dimension(1094, 600));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel3.setPreferredSize(new java.awt.Dimension(217, 161));
@@ -411,6 +404,214 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(23, 23, 23))
         );
 
+        jPanel7.setPreferredSize(new java.awt.Dimension(342, 238));
+
+        ReportArea.setColumns(20);
+        ReportArea.setRows(5);
+        ReportArea.setWrapStyleWord(true);
+        jScrollPane4.setViewportView(ReportArea);
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING)
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel2.setMinimumSize(new java.awt.Dimension(242, 214));
+        jPanel2.setPreferredSize(new java.awt.Dimension(492, 214));
+
+        MemoryTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][]
+            {
+
+            },
+            new String []
+            {
+                "Номер", "Содержание"
+            }
+        )
+        {
+            Class[] types = new Class []
+            {
+                java.lang.Integer.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean []
+            {
+                false, false
+            };
+
+            public Class getColumnClass(int columnIndex)
+            {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex)
+            {
+                return canEdit [columnIndex];
+            }
+        });
+        MemoryTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        MemoryTable.getTableHeader().setReorderingAllowed(false);
+        MemoryTable.setShowVerticalLines(true);
+        jScrollPane1.setViewportView(MemoryTable);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        jPanel6.setMinimumSize(new java.awt.Dimension(342, 251));
+        jPanel6.setPreferredSize(new java.awt.Dimension(342, 251));
+
+        btStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/control_start_blue.png"))); // NOI18N
+        btStart.setDisabledIcon(null);
+        btStart.setEnabled(false);
+        btStart.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btStartActionPerformed(evt);
+            }
+        });
+
+        btPlay.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/control_play_blue.png"))); // NOI18N
+        btPlay.setDisabledIcon(null);
+        btPlay.setEnabled(false);
+        btPlay.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btPlayActionPerformed(evt);
+            }
+        });
+
+        btPrev.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/control_rewind_blue.png"))); // NOI18N
+        btPrev.setDisabledIcon(null);
+        btPrev.setEnabled(false);
+        btPrev.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btPrevActionPerformed(evt);
+            }
+        });
+
+        btPause.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/control_pause_blue.png"))); // NOI18N
+        btPause.setDisabledIcon(null);
+        btPause.setEnabled(false);
+        btPause.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btPauseActionPerformed(evt);
+            }
+        });
+
+        btNext.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/control_fastforward_blue.png"))); // NOI18N
+        btNext.setDisabledIcon(null);
+        btNext.setEnabled(false);
+        btNext.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btNextActionPerformed(evt);
+            }
+        });
+
+        btEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icons/control_end_blue.png"))); // NOI18N
+        btEnd.setDisabledIcon(null);
+        btEnd.setEnabled(false);
+        btEnd.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btEndActionPerformed(evt);
+            }
+        });
+
+        jPanel9.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel9.setMinimumSize(new java.awt.Dimension(200, 200));
+        jPanel9.setPreferredSize(new java.awt.Dimension(300, 300));
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(btStart)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btPrev)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btPlay)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btPause)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btNext)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btEnd)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btStart, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btNext, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btEnd, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btPrev, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btPlay, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btPause, javax.swing.GroupLayout.Alignment.TRAILING)))
+        );
+
         java.awt.GridBagLayout CachePaneLayout = new java.awt.GridBagLayout();
         CachePaneLayout.columnWidths = new int[] {0};
         CachePaneLayout.rowHeights = new int[] {0};
@@ -421,11 +622,26 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2)
+        );
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -435,8 +651,8 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -451,11 +667,11 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE))
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -496,22 +712,70 @@ public class MainFrame extends javax.swing.JFrame {
     private void ReadButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ReadButtonActionPerformed
     {//GEN-HEADEREND:event_ReadButtonActionPerformed
         Model.ReadToCache(this.SelectedCacheNum, this.SelectedMemoryString);
+        this.Command = Commands.READ;
         Update();
     }//GEN-LAST:event_ReadButtonActionPerformed
 
     private void InvalidateButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_InvalidateButtonActionPerformed
     {//GEN-HEADEREND:event_InvalidateButtonActionPerformed
         Model.DropFromCache(this.SelectedCacheNum, this.SelectedCacheString);
+        this.Command = Commands.INVALIDATE;
         Update();
     }//GEN-LAST:event_InvalidateButtonActionPerformed
 
     private void WriteButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_WriteButtonActionPerformed
     {//GEN-HEADEREND:event_WriteButtonActionPerformed
       Model.WriteToCache(SelectedCacheNum, SelectedMemoryString, this.NewStringField.getText());
+      this.Command = Commands.WRITE;
       Update();
     }//GEN-LAST:event_WriteButtonActionPerformed
 
+    private void btStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btStartActionPerformed
+    {//GEN-HEADEREND:event_btStartActionPerformed
+        InitReports();
+        this.repaint();
+    }//GEN-LAST:event_btStartActionPerformed
+
+    private void btPrevActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btPrevActionPerformed
+    {//GEN-HEADEREND:event_btPrevActionPerformed
+       PrevStep();
+       this.repaint();
+    }//GEN-LAST:event_btPrevActionPerformed
+
+    private void btPlayActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btPlayActionPerformed
+    {//GEN-HEADEREND:event_btPlayActionPerformed
+        if (this.VisualisatorStepNum < this.Operations.size() - 1)
+        {
+            this.Timer.start();
+            this.btPlay.setEnabled(false);
+            this.btPause.setEnabled(true);
+        }
+    }//GEN-LAST:event_btPlayActionPerformed
+
+    private void btPauseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btPauseActionPerformed
+    {//GEN-HEADEREND:event_btPauseActionPerformed
+        this.Timer.stop();
+        this.btPlay.setEnabled(true);
+        this.btPause.setEnabled(false);
+    }//GEN-LAST:event_btPauseActionPerformed
+
+    private void btNextActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btNextActionPerformed
+    {//GEN-HEADEREND:event_btNextActionPerformed
+       NextStep();
+       this.repaint();
+    }//GEN-LAST:event_btNextActionPerformed
+
+    private void btEndActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btEndActionPerformed
+    {//GEN-HEADEREND:event_btEndActionPerformed
+       while (this.VisualisatorStepNum < this.Operations.size()-1)
+            NextStep();
+       this.repaint();
+    }//GEN-LAST:event_btEndActionPerformed
+
     private void Update() {
+        
+        InitReports();               
+        
         ArrayList<I_MESI_Cache> Caches = Model.GetCaches();
         for (int i = 0; i < this.CacheTables.size(); i++)
         {
@@ -530,6 +794,178 @@ public class MainFrame extends javax.swing.JFrame {
         CheckInvalidateButton();
         this.repaint();
     }
+    
+    private void InitReports() {
+        Operations = Model.GetOperations();
+        this.VisualisatorStepNum = 0;
+        UpdateButtonsState();
+        this.ReportArea.setText("");
+        if (this.Operations.size() > 0)
+            this.ReportArea.append(this.GetCommandStartDescription(this.Operations.get(0).Primary_Cache_Num,
+                    this.Operations.get(0).Current_Memory_String_Num,this.Model.GetCahceSize()));
+        this.btPlay.setEnabled(true);
+
+    }
+    
+    private void NextStep() {
+        VisualisatorStepNum++;
+        ReportArea.append("\n"+"\n"+GetOperationDescription(Operations.get(VisualisatorStepNum)));
+        this.UpdateButtonsState();
+        if (VisualisatorStepNum == this.Operations.size()-1)
+            ReportArea.append("\n"+"\n"+this.GetCommandEndDescription(this.Operations.get(0).Primary_Cache_Num));
+    }
+    
+    private void PrevStep() {
+        
+        String Temp = ReportArea.getText().substring(0,ReportArea.getText().lastIndexOf("\n"));
+        Temp = Temp.substring(0, Temp.lastIndexOf("\n"));
+        if (VisualisatorStepNum == this.Operations.size()-1)
+        {
+           Temp = Temp.substring(0, Temp.lastIndexOf("\n"));
+           Temp = Temp.substring(0, Temp.lastIndexOf("\n"));
+        }
+        ReportArea.setText(Temp);
+        VisualisatorStepNum--;
+        this.UpdateButtonsState();
+    }
+    
+    private String GetCommandStartDescription(int CacheNum, int MemStringNum, int CacheSize)
+    {
+        int CacheStringNum = MemStringNum % CacheSize;
+        String Temp = "";
+        switch (this.Command)
+        {
+            case READ: Temp = "В кэше НК выполняется операция чтения "
+                    + "строки памяти НМ, соответствующей строке кэша НСК.";
+                break;
+            case WRITE: Temp = "В кэше НК выполняется операция записи "
+                    + "строки памяти НМ, соответствующей строке кэша НСК.";
+                break;
+            case INVALIDATE: Temp = "В кэше НК выполняется операция инвалидации "
+                    + "строки кэша НСК.";
+                break;                
+        }
+        Temp = Temp.replaceAll("НК", "№"+String.valueOf(CacheNum+1));
+        Temp = Temp.replaceAll("НСК", "№"+String.valueOf(CacheStringNum+1));
+        Temp = Temp.replaceAll("НМ", "№"+String.valueOf(MemStringNum+1));
+        return Temp;
+    }
+    
+     private String GetCommandEndDescription(int CacheNum)
+    {
+        String Temp = "";
+        switch (this.Command)
+        {
+            case READ: Temp = "Операция чтения в кэше НК успешно завершена. ";
+                break;
+            case WRITE: Temp = "Операция записи в кэше НК успешно завершена. ";
+                break;
+            case INVALIDATE: Temp = "Операция инвалидации в кэше НК успешно завершена. ";
+                break;                
+        }
+        Temp = Temp.replaceAll("НК", "№"+String.valueOf(CacheNum+1));
+        return Temp;
+    }
+    
+    private String GetOperationDescription(MESI_Operation_Descriptor D)
+    {
+        String Temp = "";
+        boolean Self = D.Primary_Cache_Num == D.Current_Cache_Num;
+        switch (D.Operation)
+        {
+            case EXCLUSIVE_TO_EXCLUSIVE_READ: 
+                Temp = "Попадание чтения в кэше НК. Кэш является единственным владельцем строки памяти НМ";
+                break;
+            case SHARED_TO_SHARED_READ: 
+                Temp = "Попадание чтения в кэше НК. Кэш является одним из владельцев строки памяти НМ";
+                break;
+            case MODIFIED_TO_MODIFIED_READ: 
+                Temp = "Попадание чтения в кэше НК. Кэш является единственным владельцем"
+                        + " модифицированной строки памяти НМ";
+                break;
+            case READ_REQUEST: 
+                Temp = "Кэш НК опрашивает другие кэши о наличии в них строки памяти НМ";
+                break;
+            case READING_FROM_MEMORY: 
+                Temp = "Кэш НК читает из памяти строку НМ";
+                break;
+            case INVALID_TO_EXCLUSIVE: 
+                Temp = "Кэш НК не получил от других кэшей ответов о владении строки НМ "
+                        + "и становится ее единственным владельцем";
+                break;
+            case INVALID_TO_SHARED: 
+                Temp = "Кэш НК становится одним из владельцев строки памяти НМ";
+                break;
+            case EXCLUSIVE_TO_SHARED: 
+                Temp = "Кэш НК получает запрос от кэша НП о владении строкой НМ."
+                        + " Он являлся единственным владельцем строки, но теперь будет разделять ее с кэщем НП";
+                break;
+            case SHARED_TO_SHARED: 
+                Temp = "Кэш НК получает запрос от кэша НП о владении строкой НМ."
+                        + " Он уже разделяет владение этой строкой, поэтому изменения состояния не происходит";
+                break;
+            case WRITE_TO_MEMORY: 
+                Temp = "Кэш НК записывает сделанные модификации в память";
+                break;
+            case MODIFIED_TO_SHARED: 
+                Temp = "Кэш НК получает запрос от кэша НП о владении строкой НМ."
+                        + " Он модифицировал эту строку, и потому поместил внесенные изменения в память"
+                        + " прежде, чем перевести ее в состояние разделенного владения";
+                break;
+            case MODIFIED_TO_MODIFIED_WRITE: 
+                Temp = "Кэш НК осуществляет запись в уже ранее модифицированную им строку памяти НМ";
+                break;
+            case EXCLUSIVE_TO_MODIFIED: 
+                Temp = "Кэш НК осуществляет запись в строку памяти НМ, которой владеет единолично";
+                break;
+            case INVALIDATE_REQUSET: 
+                Temp = "Кэщ НК требует от других кэшей инвалидировать строку НМ, поскольку он собирается "
+                        + "модифицировать ее";
+                break;
+            case INVALID_TO_MODIFIED: 
+                Temp = "Кэш НК забирает владение строкой памяти НМ, послав требование инвалиации"
+                        + " и записывает в себя новое значение. Чтения из памяти не происходит";
+                break;
+            case SHARED_TO_MODIFIED: 
+                Temp = "Кэш НК заставляет кэши, разделявшие с ним владение инвалидировать свои копии строки НМ"
+                        + " и записывает в себя новое значение этой строки";
+                break;
+            case EXCLUSIVE_TO_INVALID: 
+                Temp = "Кэш НК получил запрос об инвалидации строки НМ от ";
+                if (Self)
+                     Temp += "пользователя. ";
+                else Temp += "кэша НП. ";
+                Temp += "До инвалидации кэш был единственным владельцем строки.";
+                break;
+            case SHARED_TO_INVALID: 
+                Temp = "Кэш НК получил запрос об инвалидации строки НМ от ";
+                if (Self)
+                     Temp += "пользователя. ";
+                else Temp += "кэша НП. ";
+                Temp += "До инвалидации кэш был одним из владельцев строки.";
+                break;
+            case MODIFIED_TO_INVALID: 
+                Temp = "Кэш НК получил запрос об инвалидации строки НМ от ";
+                if (Self)
+                     Temp += "пользователя. ";
+                else Temp += "кэша НП. ";
+                Temp += "";
+                break;
+        }
+        Temp = Temp.replaceAll("НК", "№"+String.valueOf(D.Current_Cache_Num+1));
+        Temp = Temp.replaceAll("НП", "№"+String.valueOf(D.Primary_Cache_Num+1));
+        Temp = Temp.replaceAll("НМ", "№"+String.valueOf(D.Current_Memory_String_Num+1));
+        return Temp;
+    }
+    private void UpdateButtonsState()
+    {
+        this.btStart.setEnabled(this.VisualisatorStepNum > 0);
+        this.btPrev.setEnabled(this.VisualisatorStepNum > 0);
+        this.btEnd.setEnabled(this.VisualisatorStepNum < this.Operations.size() - 1);
+        this.btNext.setEnabled(this.VisualisatorStepNum < this.Operations.size() - 1);
+
+    }
+    
     private void SetUpMemory()
     {
         ((DefaultTableModel)this.MemoryTable.getModel()).setRowCount(Model.GetMemSize());
@@ -568,9 +1004,9 @@ public class MainFrame extends javax.swing.JFrame {
           
             
             JTable CacheTable = new javax.swing.JTable();
-            CacheTableModel Model = new CacheTableModel(0);
-            Model.ExtractCacheData(Caches.get(0));
-            CacheTable.setModel(Model);
+            CacheTableModel TableModel = new CacheTableModel(0);
+            TableModel.ExtractCacheData(Caches.get(0));
+            CacheTable.setModel(TableModel);
             adjustColumnSizes(CacheTable, 0, 2);
             adjustColumnSizes(CacheTable, 1, 2);
             adjustColumnSizes(CacheTable, 2, 2);
@@ -779,9 +1215,16 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTable MemoryTable;
     private javax.swing.JTextField NewStringField;
     private javax.swing.JButton ReadButton;
+    private javax.swing.JTextArea ReportArea;
     private javax.swing.JComboBox StringComboBox;
     private javax.swing.JFormattedTextField String_Size_Field;
     private javax.swing.JButton WriteButton;
+    private javax.swing.JButton btEnd;
+    private javax.swing.JButton btNext;
+    private javax.swing.JButton btPause;
+    private javax.swing.JButton btPlay;
+    private javax.swing.JButton btPrev;
+    private javax.swing.JButton btStart;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -794,7 +1237,13 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane4;
     // End of variables declaration//GEN-END:variables
 }

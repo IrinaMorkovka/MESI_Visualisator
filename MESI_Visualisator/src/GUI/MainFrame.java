@@ -122,6 +122,7 @@ public class MainFrame extends javax.swing.JFrame {
                 if (VisualisatorStepNum < Operations.size()-1)
                     NextStep();
                 else btPauseActionPerformed(null);
+                repaint();
             }}
          );
     }
@@ -215,14 +216,13 @@ public class MainFrame extends javax.swing.JFrame {
         btPause = new javax.swing.JButton();
         btNext = new javax.swing.JButton();
         btEnd = new javax.swing.JButton();
-        jPanel9 = new javax.swing.JPanel();
+        outputPanel1 = new GUI.OutputPanel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         CachePane = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(850, 600));
-        setPreferredSize(new java.awt.Dimension(1094, 600));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel3.setPreferredSize(new java.awt.Dimension(217, 161));
@@ -389,7 +389,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
                     .addComponent(CacheStringComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(9, 9, 9)
                 .addComponent(ReadButton)
@@ -559,18 +559,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jPanel9.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jPanel9.setMinimumSize(new java.awt.Dimension(200, 200));
-        jPanel9.setPreferredSize(new java.awt.Dimension(300, 300));
-
-        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
-        jPanel9.setLayout(jPanel9Layout);
-        jPanel9Layout.setHorizontalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout outputPanel1Layout = new javax.swing.GroupLayout(outputPanel1);
+        outputPanel1.setLayout(outputPanel1Layout);
+        outputPanel1Layout.setHorizontalGroup(
+            outputPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        jPanel9Layout.setVerticalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        outputPanel1Layout.setVerticalGroup(
+            outputPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
@@ -579,37 +575,33 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
-                    .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(btStart)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btPrev)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btPlay)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btPause)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btNext)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btEnd)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                .addGap(10, 10, 10)
+                .addComponent(btStart)
+                .addGap(6, 6, 6)
+                .addComponent(btPrev)
+                .addGap(6, 6, 6)
+                .addComponent(btPlay)
+                .addGap(6, 6, 6)
+                .addComponent(btPause)
+                .addGap(6, 6, 6)
+                .addComponent(btNext)
+                .addGap(6, 6, 6)
+                .addComponent(btEnd)
+                .addContainerGap(10, Short.MAX_VALUE))
+            .addComponent(outputPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                .addComponent(outputPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btStart, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btNext, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btEnd, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btPrev, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btPlay, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btPause, javax.swing.GroupLayout.Alignment.TRAILING)))
+                    .addComponent(btStart)
+                    .addComponent(btPrev)
+                    .addComponent(btPlay)
+                    .addComponent(btPause)
+                    .addComponent(btNext)
+                    .addComponent(btEnd)))
         );
 
         java.awt.GridBagLayout CachePaneLayout = new java.awt.GridBagLayout();
@@ -640,7 +632,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -667,7 +659,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE))
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -767,9 +759,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void btEndActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btEndActionPerformed
     {//GEN-HEADEREND:event_btEndActionPerformed
-       while (this.VisualisatorStepNum < this.Operations.size()-1)
-            NextStep();
-       this.repaint();
+        while (this.VisualisatorStepNum < this.Operations.size()-1)
+        NextStep();
+        this.repaint();
     }//GEN-LAST:event_btEndActionPerformed
 
     private void Update() {
@@ -797,19 +789,21 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void InitReports() {
         Operations = Model.GetOperations();
-        this.VisualisatorStepNum = 0;
+        this.VisualisatorStepNum = -1;
         UpdateButtonsState();
         this.ReportArea.setText("");
         if (this.Operations.size() > 0)
             this.ReportArea.append(this.GetCommandStartDescription(this.Operations.get(0).Primary_Cache_Num,
                     this.Operations.get(0).Current_Memory_String_Num,this.Model.GetCahceSize()));
         this.btPlay.setEnabled(true);
+        this.outputPanel1.Reset();
 
     }
     
     private void NextStep() {
         VisualisatorStepNum++;
         ReportArea.append("\n"+"\n"+GetOperationDescription(Operations.get(VisualisatorStepNum)));
+        this.outputPanel1.SetState(Operations.get(VisualisatorStepNum));
         this.UpdateButtonsState();
         if (VisualisatorStepNum == this.Operations.size()-1)
             ReportArea.append("\n"+"\n"+this.GetCommandEndDescription(this.Operations.get(0).Primary_Cache_Num));
@@ -817,15 +811,22 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void PrevStep() {
         
+         VisualisatorStepNum--;
+         if (VisualisatorStepNum <0)
+         {
+             this.InitReports();
+             return;
+         }
         String Temp = ReportArea.getText().substring(0,ReportArea.getText().lastIndexOf("\n"));
         Temp = Temp.substring(0, Temp.lastIndexOf("\n"));
-        if (VisualisatorStepNum == this.Operations.size()-1)
+        if (VisualisatorStepNum == this.Operations.size()-2)
         {
            Temp = Temp.substring(0, Temp.lastIndexOf("\n"));
            Temp = Temp.substring(0, Temp.lastIndexOf("\n"));
         }
         ReportArea.setText(Temp);
-        VisualisatorStepNum--;
+       
+        this.outputPanel1.SetState(Operations.get(VisualisatorStepNum));
         this.UpdateButtonsState();
     }
     
@@ -959,8 +960,8 @@ public class MainFrame extends javax.swing.JFrame {
     }
     private void UpdateButtonsState()
     {
-        this.btStart.setEnabled(this.VisualisatorStepNum > 0);
-        this.btPrev.setEnabled(this.VisualisatorStepNum > 0);
+        this.btStart.setEnabled(this.VisualisatorStepNum >= 0);
+        this.btPrev.setEnabled(this.VisualisatorStepNum >= 0);
         this.btEnd.setEnabled(this.VisualisatorStepNum < this.Operations.size() - 1);
         this.btNext.setEnabled(this.VisualisatorStepNum < this.Operations.size() - 1);
 
@@ -1241,9 +1242,9 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane4;
+    private GUI.OutputPanel outputPanel1;
     // End of variables declaration//GEN-END:variables
 }

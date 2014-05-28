@@ -79,7 +79,7 @@ public class OutputPanel extends JPanel{
     {
        this.Reset();
        Cache = "Кэш №"+String.valueOf(O.Current_Cache_Num+1);
-       CacheString =  "Строка кэша №"+String.valueOf(O.Current_Cache_Num+1);;
+       CacheString =  "Строка памяти №"+String.valueOf(O.Current_Memory_String_Num+1);;
        switch (O.Operation) {
            case EXCLUSIVE_TO_EXCLUSIVE_READ: 
                 EERH = Color.red.brighter();

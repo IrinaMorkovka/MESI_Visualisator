@@ -166,11 +166,11 @@ public class MESI_Cache implements I_MESI_Cache {
             this.Drop(CacheStringNum, Operations, Cache_Num);
             Operations.add(new MESI_Operation_Descriptor(
                     MESI_Transitions.INVALIDATE_REQUSET, Cache_Num,
-                    Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+                    Cache_Num, Mem_String_Num));
             Parent.Invalidate(Mem_String_Num,Cache_Num);
             Operations.add(new MESI_Operation_Descriptor(
                     MESI_Transitions.INVALID_TO_MODIFIED, Cache_Num,
-                    Cache_Num, MemoryStringNumbers.get(CacheStringNum)));
+                    Cache_Num, Mem_String_Num));
         }
         States.set(CacheStringNum, MESI_States.MODIFIED);
         Strings.set(CacheStringNum, New);

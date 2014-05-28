@@ -9,6 +9,7 @@ package Logic;
 import Interfaces.I_MESI_Cache;
 import Interfaces.I_MESI_Model;
 import Interfaces.MESI_Operation_Descriptor;
+import de.svenjacobs.loremipsum.LoremIpsum;
 import java.util.ArrayList;
 
 /**
@@ -44,8 +45,23 @@ public class MESI_Model implements I_MESI_Model  {
         for (int i=0; i < Cache_Num;i++)
             Caches.add(new MESI_Cache(Cache_Size, this,i));
         Memory =  new ArrayList<>(Memory_Size);
+        LoremIpsum Generator = new LoremIpsum();
+        int Ind = 0;
         for (int i=0; i < Memory_Size;i++)
-            Memory.add("");
+        {
+            String  Temp = "";
+            int j=0;
+            while (Temp.length() < this.String_Size)
+            {
+                j++;
+                Temp = Generator.getWords(j, Ind);
+            }
+            Ind+=j;
+            if (Ind>50)
+                Ind = 0;
+            
+            Memory.add(Temp.substring(0, String_Size));
+        }
         Operations = new ArrayList<>();
     }        
 

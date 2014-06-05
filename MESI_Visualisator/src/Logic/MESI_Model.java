@@ -102,7 +102,7 @@ public class MESI_Model implements I_MESI_Model  {
     public void DropFromCache(int Cache_Num, int Cache_String_Num)
     {
          Operations.clear();
-         Caches.get(Cache_Num).WriteDrop(Cache_String_Num,this.Operations,Cache_Num);
+         Caches.get(Cache_Num).WriteDrop(Cache_String_Num,this.Operations, -1);
     }
     
     public String GetFromMemory(int Mem_String_Num)

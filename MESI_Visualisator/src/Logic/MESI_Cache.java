@@ -78,7 +78,7 @@ public class MESI_Cache implements I_MESI_Cache {
             }
             return;
         }
-        this.Drop(CacheStringNum, Operations,Cache_Num);
+        this.WriteDrop(CacheStringNum, Operations,Cache_Num);
         Operations.add(new MESI_Operation_Descriptor(
                 MESI_Transitions.READ_REQUEST, Cache_Num,
                 Cache_Num, Mem_String_Num));

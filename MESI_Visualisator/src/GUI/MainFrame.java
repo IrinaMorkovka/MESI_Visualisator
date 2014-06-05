@@ -772,11 +772,9 @@ public class MainFrame extends javax.swing.JFrame {
         for (int i = 0; i < this.CacheTables.size(); i++)
         {
             ((CacheTableModel)CacheTables.get(i).getModel()).ExtractCacheData(Caches.get(i));
-            adjustColumnSizes(CacheTables.get(i), 0, 2);
-            adjustColumnSizes(CacheTables.get(i), 1, 2);
-            adjustColumnSizes(CacheTables.get(i), 2, 2);
             adjustColumnSizes(CacheTables.get(i), 3, 2);
             adjustTableSize(CacheTables.get(i));
+            
         }
         ArrayList<String> Memory = Model.GetMemory();
         for (int i = 0; i < this.MemoryTable.getRowCount(); i++)
@@ -784,6 +782,7 @@ public class MainFrame extends javax.swing.JFrame {
             this.MemoryTable.setValueAt(Memory.get(i), i, 1);
         }
         CheckInvalidateButton();
+        this.validate();
         this.repaint();
     }
     
@@ -971,10 +970,12 @@ public class MainFrame extends javax.swing.JFrame {
     {
         ((DefaultTableModel)this.MemoryTable.getModel()).setRowCount(Model.GetMemSize());
         StringComboBox.removeAllItems();
+        ArrayList<String> Memory = Model.GetMemory();
         for (int i=0;i<Model.GetMemSize();i++)
         {
             ((DefaultTableModel)this.MemoryTable.getModel()).setValueAt(i+1, i, 0);
-            StringComboBox.addItem("Строка № " + String.valueOf(i+1));
+            StringComboBox.addItem("Строка № " + String.valueOf(i+1)); 
+            this.MemoryTable.setValueAt(Memory.get(i), i, 1);
         }
         adjustColumnSizes(MemoryTable, 0, 2);
         SelectMemoryString(0);
@@ -1077,6 +1078,7 @@ public class MainFrame extends javax.swing.JFrame {
             PreferredWidth +=colModel.getColumn(i).getPreferredWidth();
         }
         table.setPreferredSize(new Dimension(PreferredWidth,table.getPreferredSize().height));
+        table.setMaximumSize(new Dimension(MaxWidth,table.getMaximumSize().height));
     }
    
    private void SelectCache(int Num)
@@ -1139,7 +1141,7 @@ public class MainFrame extends javax.swing.JFrame {
                CacheStringComboBox.setSelectedIndex(Num);
                if (!SelectingMemoryString)
                {
-                   SelectMemoryString(Integer.parseInt(CacheTables.get(CacheNum).getValueAt(Num, 2).toString()));
+                   SelectMemoryString(Integer.parseInt(CacheTables.get(CacheNum).getValueAt(Num, 2).toString())-1);
                }
            } else
            {

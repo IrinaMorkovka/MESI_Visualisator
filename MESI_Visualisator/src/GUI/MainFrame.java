@@ -870,7 +870,7 @@ public class MainFrame extends javax.swing.JFrame {
     private String GetOperationDescription(MESI_Operation_Descriptor D)
     {
         String Temp = "";
-        boolean Self = D.Primary_Cache_Num == D.Current_Cache_Num;
+        boolean User = D.Primary_Cache_Num == -1;
         switch (D.Operation)
         {
             case EXCLUSIVE_TO_EXCLUSIVE_READ: 
@@ -932,21 +932,21 @@ public class MainFrame extends javax.swing.JFrame {
                 break;
             case EXCLUSIVE_TO_INVALID: 
                 Temp = "Кэш НК получил запрос об инвалидации строки НМ от ";
-                if (Self)
+                if (User)
                      Temp += "пользователя. ";
                 else Temp += "кэша НП. ";
                 Temp += "До инвалидации кэш был единственным владельцем строки.";
                 break;
             case SHARED_TO_INVALID: 
                 Temp = "Кэш НК получил запрос об инвалидации строки НМ от ";
-                if (Self)
+                if (User)
                      Temp += "пользователя. ";
                 else Temp += "кэша НП. ";
                 Temp += "До инвалидации кэш был одним из владельцев строки.";
                 break;
             case MODIFIED_TO_INVALID: 
                 Temp = "Кэш НК получил запрос об инвалидации строки НМ от ";
-                if (Self)
+                if (User)
                      Temp += "пользователя. ";
                 else Temp += "кэша НП. ";
                 Temp += "";

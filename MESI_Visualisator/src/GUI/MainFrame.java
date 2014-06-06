@@ -64,7 +64,7 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Creates new form MainFrame
      */
-    public MainFrame()
+    public MainFrame(I_MESI_Model M)
     {
         initComponents();
         adjustColumnSizes(MemoryTable, 0, 2);
@@ -105,7 +105,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
           
         });
-         Model = new MESI_Model();
+         Model = M;
          SelectingCacheString = false;
          SelectingMemoryString = false;
          
@@ -1201,7 +1201,8 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void run()
             {
-                new MainFrame().setVisible(true);
+                MESI_Model M = new MESI_Model();
+                new MainFrame(M).setVisible(true);
             }
         });
     }

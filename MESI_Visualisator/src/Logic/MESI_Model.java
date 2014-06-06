@@ -18,7 +18,7 @@ import java.util.ArrayList;
  */
 public class MESI_Model implements I_MESI_Model  {
 
-    private int Memory_Size;
+
     private int Cache_Size;
     private int String_Size;
     private ArrayList<MESI_Cache> Caches;
@@ -38,7 +38,6 @@ public class MESI_Model implements I_MESI_Model  {
     @Override
     public void Initialize(int Cache_Num, int Memory_Size, int Cache_Size, int String_Size)
     {
-        this.Memory_Size = Memory_Size;
         this.Cache_Size = Cache_Size;
         this.String_Size = String_Size;
         Caches =  new ArrayList<>(Cache_Num);
@@ -135,7 +134,7 @@ public class MESI_Model implements I_MESI_Model  {
     @Override
     public int GetMemSize()
     {
-        return this.Memory_Size;
+        return this.Memory.size();
     }
 
     @Override

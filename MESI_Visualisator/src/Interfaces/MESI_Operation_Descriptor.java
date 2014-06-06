@@ -6,11 +6,9 @@
 
 package Interfaces;
 
-import java.util.List;
-
 /**
  *
- * @author Vasiliy
+ * @author Irina
  */
 public class MESI_Operation_Descriptor {
     public MESI_Transitions Operation;

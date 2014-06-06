@@ -8,7 +8,7 @@ package Interfaces;
 
 /**
  *
- * @author Vasiliy
+ * @author Irina
  */
 public enum MESI_Transitions {
     EXCLUSIVE_TO_EXCLUSIVE_READ,

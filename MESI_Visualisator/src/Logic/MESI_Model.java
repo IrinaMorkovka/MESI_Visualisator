@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Vasiliy
+ * @author Irina
  */
 public class MESI_Model implements I_MESI_Model  {
 

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Vasiliy
+ * @author Irina
  */
 public class MESI_Cache implements I_MESI_Cache {
 

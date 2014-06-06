@@ -8,6 +8,6 @@ package Interfaces;
 
 /**
  *
- * @author Vasiliy
+ * @author Irina
  */
 public enum MESI_States { INVALID, EXCLUSIVE, SHARED, MODIFIED}

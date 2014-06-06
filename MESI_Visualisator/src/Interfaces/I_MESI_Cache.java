@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Vasiliy
+ * @author Irina
  */
 public interface I_MESI_Cache {
     public int GetSize();

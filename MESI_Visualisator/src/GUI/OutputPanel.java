@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author Vasiliy
+ * @author Nadja
  */
 public class OutputPanel extends JPanel{
     

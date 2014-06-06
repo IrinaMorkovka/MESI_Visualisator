@@ -13,7 +13,7 @@ import javax.swing.table.AbstractTableModel;
 
 /**
  *
- * @author Vasiliy
+ * @author Nadja
  */
 public class CacheTableModel extends AbstractTableModel  {
 

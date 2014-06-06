@@ -132,7 +132,7 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="InitButton" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="80" max="32767" attributes="0"/>
+                  <EmptySpace pref="50" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -145,17 +145,17 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&#x420;&#x430;&#x437;&#x43c;&#x435;&#x440; &#x43f;&#x430;&#x43c;&#x44f;&#x442;&#x438;"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&#x420;&#x430;&#x437;&#x43c;&#x435;&#x440; &#x43f;&#x430;&#x43c;&#x44f;&#x442;&#x438;&#xa;&lt;br&gt; (&#x432; &#x441;&#x442;&#x440;&#x43e;&#x43a;&#x430;&#x445;)&#xa;&lt;/html&gt;"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&#x420;&#x430;&#x437;&#x43c;&#x435;&#x440; &#x43a;&#x44d;&#x448;&#x430;"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&#x420;&#x430;&#x437;&#x43c;&#x435;&#x440; &#x43a;&#x44d;&#x448;&#x430;&#xa;&lt;br&gt; (&#x432; &#x441;&#x442;&#x440;&#x43e;&#x43a;&#x430;&#x445;)&#xa;&lt;/html&gt;"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&#x420;&#x430;&#x437;&#x43c;&#x435;&#x440; &#x441;&#x442;&#x440;&#x43e;&#x43a;&#x438;"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&#x420;&#x430;&#x437;&#x43c;&#x435;&#x440; &#x441;&#x442;&#x440;&#x43e;&#x43a;&#x438;&#xa;&lt;br&gt; (&#x432; &#x441;&#x438;&#x43c;&#x432;&#x43e;&#x43b;&#x430;&#x445;)&#xa;&lt;/html&gt;"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="InitButton">
@@ -228,12 +228,10 @@
                       <Component id="NewStringField" max="32767" attributes="0"/>
                       <Component id="WriteButton" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel6" min="-2" pref="84" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="jLabel8" alignment="0" min="-2" pref="84" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jLabel5" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel6" alignment="0" pref="84" max="32767" attributes="0"/>
+                              <Component id="jLabel8" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -261,11 +259,14 @@
                       <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabel8" alignment="3" pref="136" max="32767" attributes="0"/>
-                      <Component id="CacheStringComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="CacheStringComboBox" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <EmptySpace min="3" pref="3" max="-2" attributes="0"/>
+                          <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="ReadButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="InvalidateButton" min="-2" max="-2" attributes="0"/>
@@ -354,7 +355,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel8">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;&#x412;&#x44b;&#x431;&#x43e;&#x440; &#x441;&#x442;&#x440;&#x43e;&#x43a;&#x438; &#x432; &#x43a;&#x44d;&#x448;&#x435;&#xa;&lt;/html&gt;"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt; &#x412;&#x44b;&#x431;&#x43e;&#x440; &#x441;&#x442;&#x440;&#x43e;&#x43a;&#x438; &#x432; &#x43a;&#x44d;&#x448;&#x435; &lt;/html&gt;"/>
           </Properties>
         </Component>
       </SubComponents>
